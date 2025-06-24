@@ -55,6 +55,7 @@ public class ItemDataManager : MonoBehaviour
 {
     [SerializeField]
     List<ItemData> itemDatas;
+    public List<ItemData> ItemDatas { get { return itemDatas; } }
 
     public ItemData GetItem(int idx)
     {

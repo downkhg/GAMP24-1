@@ -19,16 +19,17 @@ public class Iventory : MonoBehaviour
         itemList.Remove(itemData);
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void ChatItem(ItemDataManager itemDataManage, int count)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Debug.Log("ChatItem:"+count);
+        for (int i = 0; i < count; i++)
+        {
+            foreach (ItemData item in itemDataManage.ItemDatas)
+            {
+                Debug.Log("AddIventory:" + item.name);
+                itemList.Add((ItemData)item);
+            }
+        }
     }
 
     public int idx = 3;

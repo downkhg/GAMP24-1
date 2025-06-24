@@ -22,6 +22,12 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
         itemDataManager.InitData();
+
+        Iventory Iventory = responnerPlayer.objPlayer.GetComponent<Iventory>();
+        Iventory.ChatItem(itemDataManager,3);
+
+        guiItemIventory.InitItemButton(Iventory, responnerPlayer.objPlayer);
+
         Debug.Log(this.gameObject.name + "GameManager.Start");
         SetScene(curSceneStatus);
         foreach (var item in itemList)
@@ -62,6 +68,7 @@ public class GameManager : MonoBehaviour
     public SceneStatus curSceneStatus = SceneStatus.NONE;
 
     public GUIStatusBar guiPlayerHPBar;
+    public GUIItemIventory guiItemIventory;
 
     public void UpdatePlayerHPBar()
     {
