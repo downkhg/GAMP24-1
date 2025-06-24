@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
         itemDataManager.InitData();
 
         Iventory Iventory = responnerPlayer.objPlayer.GetComponent<Iventory>();
-        Iventory.ChatItem(itemDataManager,3);
+        Iventory.ChatItem(itemDataManager,1);
 
         guiItemIventory.InitItemButton(Iventory, responnerPlayer.objPlayer);
 
