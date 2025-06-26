@@ -38,9 +38,12 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        //itemDataManager.InitData();
-        itemDataManager.LoadCSVData();
-        //itemDataManager.LoadJsonData();
+        //itemDataManager.LoadCSVData("ItemData"); // Resources 폴더의 "ItemData.csv" 파일에서 로드
+        itemDataManager.LoadJsonDataFromResources("ItemData");// Resources 폴더의 "ItemData.json" TextAsset에서 로드
+
+        //itemDataManager.InitData(); // 하드코딩된 데이터로 초기화
+        //itemDataManager.SaveItems("MySaveGame.json");   // persistentDataPath에 "MySaveGame.json" 파일로 저장
+        //itemDataManager.LoadJsonData("MySaveGame.json");  // persistentDataPath의 "MySaveGame.json" 파일에서 로드
 
         Iventory playerInventory = responnerPlayer.objPlayer.GetComponent<Iventory>();
         if (playerInventory == null)

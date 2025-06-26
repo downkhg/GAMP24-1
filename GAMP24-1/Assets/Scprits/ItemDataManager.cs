@@ -1,9 +1,9 @@
 // ItemDataManager.cs
-using System; // Enum.Parse를 위해 추가
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO; // 파일 입출력을 위해 추가
+using System.IO;
 
 public enum ItemType { NONE, FOOD, BULLET, BEHAVIOUR }
 public enum Fuction { NONE, SCORE, POISON, BLESS, BULLET, LEASER, SUPERMODE, EVENT_TRIGGER }
@@ -90,8 +90,7 @@ public class ItemDataListWrapper
 public class ItemDataManager : MonoBehaviour
 {
     private List<ItemData> itemDatas = new List<ItemData>();
-    public string itemDataCsvFileName = "ItemData"; // Resources 폴더 내의 CSV 파일 이름
-    public string saveFileName = "ItemDataSave.json"; // 저장될 JSON 파일 이름
+    // 파일 이름 관련 멤버 변수들은 제거되었습니다.
 
     public List<ItemData> ItemDatas { get { return itemDatas; } }
 
@@ -110,11 +109,11 @@ public class ItemDataManager : MonoBehaviour
         return itemDatas.Find(x => x.name == name);
     }
 
-    // [기존 InitData] 임시 테스트용: 하드코딩된 데이터로 초기화
+    // 임시 테스트용: 하드코딩된 데이터로 초기화
     public void InitData()
     {
         Debug.Log("ItemDataManager: Initializing data with hardcoded values (temporary for testing).");
-        itemDatas = new List<ItemData>(); // 기존 데이터 클리어 및 새 리스트 생성
+        itemDatas = new List<ItemData>();
         itemDatas.Add(new ItemData("Cherry", ItemType.FOOD, -1, Fuction.SCORE, 10, "사용하면 점수가 오른다."));
         itemDatas.Add(new ItemData("PoisonCherry", ItemType.FOOD, -1, Fuction.POISON, 10, "사용하면 점수가 오른다."));
         itemDatas.Add(new ItemData("GoldCherry", ItemType.FOOD, -1, Fuction.BLESS, 10, "사용하면 점수가 오른다."));
@@ -125,29 +124,29 @@ public class ItemDataManager : MonoBehaviour
         Debug.Log($"ItemDataManager: Hardcoded {itemDatas.Count} items loaded.");
     }
 
-    // CSV 파일에서 데이터를 로드하는 함수
-    public void LoadCSVData()
+    // CSV 파일에서 데이터를 로드하는 함수 (Resources 폴더)
+    // csvFileName: Resources 폴더 내의 CSV 파일 이름 (확장자 제외)
+    public void LoadCSVData(string csvFileName)
     {
-        Debug.Log("ItemDataManager: Loading data from CSV file.");
-        itemDatas.Clear(); // 기존 데이터 클리어
+        Debug.Log($"ItemDataManager: Loading data from CSV file '{csvFileName}.csv' in Resources.");
+        itemDatas.Clear();
 
-        TextAsset csvFile = Resources.Load<TextAsset>(itemDataCsvFileName);
+        TextAsset csvFile = Resources.Load<TextAsset>(csvFileName);
 
         if (csvFile == null)
         {
-            Debug.LogError($"ItemDataManager: CSV file '{itemDataCsvFileName}.csv' not found in Resources folder. Please ensure it exists and is named correctly.");
+            Debug.LogError($"ItemDataManager: CSV file '{csvFileName}.csv' not found in Resources folder. Please ensure it exists and is named correctly.");
             return;
         }
 
         string[] lines = csvFile.text.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-        if (lines.Length <= 1) // 헤더만 있거나 내용이 없는 경우
+        if (lines.Length <= 1)
         {
             Debug.LogWarning("ItemDataManager: CSV file is empty or only contains header.");
             return;
         }
 
-        // 첫 번째 줄은 헤더이므로 건너뛴다.
         for (int i = 1; i < lines.Length; i++)
         {
             string line = lines[i].Trim();
@@ -180,37 +179,40 @@ public class ItemDataManager : MonoBehaviour
         Debug.Log($"ItemDataManager: Loaded {itemDatas.Count} items from CSV.");
     }
 
-    // 저장 파일 경로를 반환하는 헬퍼 함수
-    private string GetSavePath()
+    // 저장 파일 경로를 반환하는 헬퍼 함수 (persistentDataPath용)
+    // fileName: 저장할 파일 이름 (예: "ItemDataSave.json")
+    private string GetSavePath(string fileName)
     {
-        return Path.Combine(Application.persistentDataPath, saveFileName);
+        return Path.Combine(Application.persistentDataPath, fileName);
     }
 
-    // 현재 아이템 데이터를 JSON 파일로 저장하는 함수
-    public void SaveItems()
+    // 현재 아이템 데이터를 JSON 파일로 저장하는 함수 (persistentDataPath)
+    // jsonFileName: 저장할 JSON 파일 이름 (예: "ItemDataSave.json")
+    public void SaveItems(string jsonFileName)
     {
         ItemDataListWrapper wrapper = new ItemDataListWrapper();
         wrapper.items = itemDatas;
 
-        // true는 가독성을 위한 예쁜 출력. 실제 빌드에서는 false로 두는 것이 성능에 유리할 수 있습니다.
         string json = JsonUtility.ToJson(wrapper, true);
 
+        string path = GetSavePath(jsonFileName);
         try
         {
-            File.WriteAllText(GetSavePath(), json);
-            Debug.Log($"ItemDataManager: Items saved to {GetSavePath()}");
+            File.WriteAllText(path, json);
+            Debug.Log($"ItemDataManager: Items saved to {path}");
         }
         catch (Exception e)
         {
-            Debug.LogError($"ItemDataManager: Failed to save items: {e.Message}");
+            Debug.LogError($"ItemDataManager: Failed to save items to {path}: {e.Message}");
         }
     }
 
-    // JSON 파일에서 아이템 데이터를 불러오는 함수
-    public void LoadJsonData()
+    // JSON 파일에서 아이템 데이터를 불러오는 함수 (persistentDataPath)
+    // jsonFileName: 불러올 JSON 파일 이름 (예: "ItemDataSave.json")
+    public void LoadJsonData(string jsonFileName)
     {
-        Debug.Log("ItemDataManager: Attempting to load data from JSON file.");
-        string path = GetSavePath();
+        Debug.Log($"ItemDataManager: Attempting to load data from JSON file '{jsonFileName}' in persistentDataPath.");
+        string path = GetSavePath(jsonFileName);
 
         if (File.Exists(path))
         {
@@ -226,19 +228,56 @@ public class ItemDataManager : MonoBehaviour
                 else
                 {
                     Debug.LogWarning($"ItemDataManager: JSON file at {path} was empty or malformed. No items loaded.");
-                    itemDatas.Clear(); // 데이터 비우기
+                    itemDatas.Clear();
                 }
             }
             catch (Exception e)
             {
                 Debug.LogError($"ItemDataManager: Failed to load items from {path}: {e.Message}");
-                itemDatas.Clear(); // 로드 실패 시 기존 데이터 클리어
+                itemDatas.Clear();
             }
         }
         else
         {
             Debug.LogWarning($"ItemDataManager: JSON save file not found at {path}.");
-            itemDatas.Clear(); // 파일이 없으면 데이터 비우기
+            itemDatas.Clear();
+        }
+    }
+
+    // Resources 폴더에서 JSON 파일을 TextAsset으로 읽어 아이템 데이터를 불러오는 함수
+    // jsonFileName: Resources 폴더 내의 JSON 파일 이름 (확장자 제외)
+    public void LoadJsonDataFromResources(string jsonFileName)
+    {
+        Debug.Log($"ItemDataManager: Attempting to load data from JSON TextAsset '{jsonFileName}' in Resources.");
+        itemDatas.Clear();
+
+        TextAsset jsonFile = Resources.Load<TextAsset>(jsonFileName);
+
+        if (jsonFile == null)
+        {
+            Debug.LogError($"ItemDataManager: JSON file '{jsonFileName}.json' (or .txt) not found in Resources folder. Please ensure it exists and is named correctly.");
+            return;
+        }
+
+        try
+        {
+            string json = jsonFile.text;
+            ItemDataListWrapper wrapper = JsonUtility.FromJson<ItemDataListWrapper>(json);
+            if (wrapper != null && wrapper.items != null)
+            {
+                itemDatas = wrapper.items;
+                Debug.Log($"ItemDataManager: Loaded {itemDatas.Count} items from Resources/{jsonFileName}.json");
+            }
+            else
+            {
+                Debug.LogWarning($"ItemDataManager: JSON TextAsset '{jsonFileName}' was empty or malformed. No items loaded.");
+                itemDatas.Clear();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"ItemDataManager: Failed to parse JSON from TextAsset '{jsonFileName}': {e.Message}");
+            itemDatas.Clear();
         }
     }
 }

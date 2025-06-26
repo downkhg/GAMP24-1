@@ -2354,7 +2354,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79af9d2a24edcfe4c80e9b53efb91f88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemDatas: []
+  itemDataCsvFileName: ItemData
+  itemDataJsonFileName: ItemDataSave
 --- !u!1 &1072023938
 GameObject:
   m_ObjectHideFlags: 0
