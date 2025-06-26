@@ -1,0 +1,60 @@
+{
+    "items": [
+        {
+            "name": "Cherry",
+            "type": 1,
+            "time": -1.0,
+            "fuction": 1,
+            "Score": 10,
+            "Comment": "사용하면 점수가 오른다."
+        },
+        {
+            "name": "PoisonCherry",
+            "type": 1,
+            "time": -1.0,
+            "fuction": 2,
+            "Score": 10,
+            "Comment": "사용하면 점수가 오른다."
+        },
+        {
+            "name": "GoldCherry",
+            "type": 1,
+            "time": -1.0,
+            "fuction": 3,
+            "Score": 10,
+            "Comment": "사용하면 점수가 오른다."
+        },
+        {
+            "name": "Bullet",
+            "type": 2,
+            "time": -1.0,
+            "fuction": 4,
+            "Score": 10,
+            "Comment": "총알을 발사한다."
+        },
+        {
+            "name": "Leaser",
+            "type": 2,
+            "time": -1.0,
+            "fuction": 5,
+            "Score": 10,
+            "Comment": "레이저를 발사한다."
+        },
+        {
+            "name": "SuperGem",
+            "type": 3,
+            "time": -1.0,
+            "fuction": 6,
+            "Score": 10,
+            "Comment": "일정시간 무적 상태가 된다."
+        },
+        {
+            "name": "EventTriggerItem",
+            "type": 3,
+            "time": -1.0,
+            "fuction": 7,
+            "Score": 0,
+            "Comment": "특정 이벤트를 발생시킨다."
+        }
+    ]
+}

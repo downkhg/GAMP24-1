@@ -1984,7 +1984,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &674248508
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2325,14 +2325,8 @@ MonoBehaviour:
   - {fileID: 1962091500}
   - {fileID: 1143197995}
   - {fileID: 419092470}
-  listGUIScene:
-  - {fileID: 1157428000}
-  - {fileID: 1364713999}
-  - {fileID: 1544311950}
-  - {fileID: 1701341753}
-  curSceneStatus: 3
-  guiPlayerHPBar: {fileID: 1429364731}
-  guiItemIventory: {fileID: 35971147}
+  guiManager: {fileID: 1842425928}
+  curSceneStatus: 1
 --- !u!4 &915570791
 Transform:
   m_ObjectHideFlags: 0
@@ -4462,6 +4456,7 @@ GameObject:
   - component: {fileID: 1842425926}
   - component: {fileID: 1842425925}
   - component: {fileID: 1842425924}
+  - component: {fileID: 1842425928}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -4556,6 +4551,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1842425928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842425923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52236dce67f50f4a839cde15d7e89da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guiPlayerHPBar: {fileID: 1429364731}
+  guiItemIventory: {fileID: 35971147}
+  objPopup: {fileID: 674248507}
+  listGUIScene:
+  - {fileID: 1157428000}
+  - {fileID: 1364713999}
+  - {fileID: 1544311950}
+  - {fileID: 1701341753}
 --- !u!1 &1879417953
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,8 @@
+name,type,time,fuction,Score,Comment
+Cherry,FOOD,-1,SCORE,10,사용하면 점수가 오른다.
+PoisonCherry,FOOD,-1,POISON,10,사용하면 점수가 오른다.
+GoldCherry,FOOD,-1,BLESS,10,사용하면 점수가 오른다.
+Bullet,BULLET,-1,BULLET,10,총알을 발사한다.
+Leaser,BULLET,-1,LEASER,10,레이저를 발사한다.
+SuperGem,BEHAVIOUR,-1,SUPERMODE,10,일정시간 무적 상태가 된다.
+EventTriggerItem,BEHAVIOUR,-1,EVENT_TRIGGER,0,특정 이벤트를 발생시킨다.

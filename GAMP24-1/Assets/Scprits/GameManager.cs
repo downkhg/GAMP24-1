@@ -1,7 +1,9 @@
+// GameManager.cs
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.SearchService;
+// using UnityEditor;
+// using UnityEditor.Experimental.GraphView;
+// using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,107 +19,82 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
-    // Start is called before the first frame update
+    // GUIManager 참조로 변경
+    public GUIManager guiManager;
+
+    public enum SceneStatus { NONE = -1, TITLE, THEEND, GAMEOVER, PLAY, MAX }
+    public SceneStatus curSceneStatus;
+
     void Start()
     {
-        instance = this;
-        itemDataManager.InitData();
+        if (instance == null)
+        {
+            instance = this;
+            // DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-        Iventory Iventory = responnerPlayer.objPlayer.GetComponent<Iventory>();
-        Iventory.ChatItem(itemDataManager,1);
+        //itemDataManager.InitData();
+        itemDataManager.LoadCSVData();
+        //itemDataManager.LoadJsonData();
 
-        guiItemIventory.InitItemButton(Iventory, responnerPlayer.objPlayer);
+        Iventory playerInventory = responnerPlayer.objPlayer.GetComponent<Iventory>();
+        if (playerInventory == null)
+        {
+            Debug.LogError("Player's Inventory component not found!");
+            return;
+        }
 
-        Debug.Log(this.gameObject.name + "GameManager.Start");
+        playerInventory.ChatItem(itemDataManager, 1);
+
+        // GUIManager 초기화
+        if (guiManager == null)
+        {
+            guiManager = FindObjectOfType<GUIManager>();
+            if (guiManager == null)
+            {
+                Debug.LogError("GUIManager not found in the scene! Please add one.");
+                return;
+            }
+        }
+        guiManager.InitializeUI(playerInventory, responnerPlayer.objPlayer);
+
+        Debug.Log(this.gameObject.name + " GameManager.Start");
         SetScene(curSceneStatus);
+
         foreach (var item in itemList)
         {
-            ItemData getitem = itemDataManager.GetItem(item.name);
-            if (getitem != null)
-                item.itemData = getitem;
-            else
-                Debug.LogWarning($"item:{item.name} is not Find!");
+            if (item != null)
+            {
+                ItemData getitem = itemDataManager.GetItem(item.name);
+                if (getitem != null)
+                    item.itemData = getitem;
+                else
+                    Debug.LogWarning($"item:{item.name} is not Find!");
+            }
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(cameraTracker.objTarget == null)
+        if (cameraTracker != null && responnerPlayer.objPlayer != null)
         {
             cameraTracker.objTarget = responnerPlayer.objPlayer;
-            cameraTracker.transform.rotation = Quaternion.identity;
-        }
-
-        if(responnerEagle.objPlayer)
-        {
-             Eagle eagle = responnerEagle.objPlayer.GetComponent<Eagle>();
-
-            if (eagle != null)
-            {
-                eagle.trResponPoint = responnerEagle.transform;
-                eagle.trPatrolPoint = responnerOpussum.transform;
-            }
         }
 
         UpdateScene();
     }
 
-    public List<GameObject> listGUIScene;
-    public enum SceneStatus { NONE = - 1, TITLE, THEEND, GAMEOVER, PLAY, MAX}
-    public SceneStatus curSceneStatus = SceneStatus.NONE;
-
-    public GUIStatusBar guiPlayerHPBar;
-    public GUIItemIventory guiItemIventory;
-
-    public void UpdatePlayerHPBar()
-    {
-        if(responnerPlayer.objPlayer != null)
-        {
-            Player player = responnerPlayer.objPlayer.GetComponent<Player>();
-            guiPlayerHPBar.UpdateStatus(player);
-        }
-    }
-
-    public void EventChangeSecne(int sceneStatueIdx)
-    {
-        SetScene((SceneStatus)sceneStatueIdx);
-    }
-
-    public void EventTheEnd()
-    {
-        if(curSceneStatus == SceneStatus.PLAY)
-            SetScene(SceneStatus.THEEND);
-    }
-
-    public void EventExit()
-    {
-        Application.Quit();
-    }
-    private void Awake()
-    {
-        
-    }
-
-    void ShowScene(SceneStatus sceneStatus)
-    {
-        for (int idx = 0; idx < listGUIScene.Count; idx++)
-        {
-            if (idx == (int)sceneStatus)
-            {
-                listGUIScene[idx].SetActive(true);
-                Debug.Log($"ShowScene({sceneStatus})");
-            }
-            else
-                listGUIScene[idx].SetActive(false);
-        }
-    }
-
     public void SetScene(SceneStatus sceneStatus)
     {
-        Debug.Log($"SetScene({sceneStatus})");
-        Time.timeScale = 0; //정지
-        switch(sceneStatus)
+        Debug.Log($"GameManager: SetScene({sceneStatus})");
+        Time.timeScale = 0;
+
+        switch (sceneStatus)
         {
             case SceneStatus.NONE:
                 break;
@@ -129,10 +106,20 @@ public class GameManager : MonoBehaviour
                 SceneManager.LoadScene(0);
                 break;
             case SceneStatus.PLAY:
-                Time.timeScale = 1; //정상속도
+                Time.timeScale = 1;
                 break;
         }
-        ShowScene(sceneStatus);
+
+        // GUIManager를 통해 UI 활성화/비활성화 지시
+        if (guiManager != null)
+        {
+            guiManager.ShowSceneUI(sceneStatus);
+        }
+        else
+        {
+            Debug.LogError("GUIManager is not assigned! Cannot show scene UI.");
+        }
+
         curSceneStatus = sceneStatus;
     }
 
@@ -141,15 +128,24 @@ public class GameManager : MonoBehaviour
         switch (curSceneStatus)
         {
             case SceneStatus.NONE:
-                break;
             case SceneStatus.TITLE:
-                break;
             case SceneStatus.THEEND:
-                break;
             case SceneStatus.GAMEOVER:
                 break;
             case SceneStatus.PLAY:
-                UpdatePlayerHPBar();
+                Player player = responnerPlayer.objPlayer.GetComponent<Player>();
+                if (player != null && guiManager != null)
+                {
+                    guiManager.UpdatePlayerHPBar(player);
+                }
+
+                if (Input.GetKeyDown(KeyCode.I))
+                {
+                    if (guiManager != null)
+                    {
+                        guiManager.ToggleInventoryPopup();
+                    }
+                }
 
                 if (responnerPlayer.objPlayer == null)
                 {
@@ -157,5 +153,24 @@ public class GameManager : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    public void EventChangeSecne(int sceneStatueIdx)
+    {
+        SetScene((SceneStatus)sceneStatueIdx);
+    }
+
+    public void EventTheEnd()
+    {
+        SetScene(SceneStatus.THEEND);
+    }
+
+    public void EventExit()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
